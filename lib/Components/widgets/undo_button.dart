@@ -1,7 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 
-Widget wicketButton({
+Widget undoButton({
   required void Function() onPressed,
 }) {
   return SizedBox(
@@ -18,13 +20,13 @@ Widget wicketButton({
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
-              color: AppColors.wicket,
+              color: AppColors.undo,
               width: 2,
             ),
             gradient: LinearGradient(
               colors: [
-                AppColors.wicket.withOpacity(0.9),
-                AppColors.wicket.withOpacity(0.6),
+                AppColors.undo.withOpacity(0.9),
+                AppColors.undo.withOpacity(0.6),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -35,13 +37,13 @@ Widget wicketButton({
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.sports_cricket,
+                  Icons.sports_handball_outlined,
                   color: Colors.white,
                   size: 20,
                 ),
                 SizedBox(width: 6),
                 Text(
-                  "WICKET",
+                  "UNDO",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

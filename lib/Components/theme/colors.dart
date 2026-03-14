@@ -24,7 +24,7 @@ class AppColors {
 }
 
 class ButtonDesign {
-  static const height = 70.0;
+  static const height = 50.0;
   static const minimumwidth = 90;
   static const borderradius = 12.0;
   static const fontsize = 22.0;

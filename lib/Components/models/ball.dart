@@ -4,7 +4,7 @@ class Ball {
   bool wicket;
 
   Ball({
-    this.runs = 0,
+    this.runs = -1,
     this.extra = "",
     this.wicket = false,
   });
