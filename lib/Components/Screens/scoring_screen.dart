@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/models/ball.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/extras_buttons.dart';
@@ -22,88 +24,49 @@ class ScoringScreen extends StatefulWidget {
 
 class _ScoringScreenState extends State<ScoringScreen> {
   final List<String> overvals = ["1", "2", "3", "4", "6", "0"];
-  int score = 0;
-  int wickets = 0;
+  // int score = 0;
+  // int wickets = 0;
 
-  int timeLineLength = 0;
-  List<Ball> timeline = [];
-  List<Over> history = [];
-  bool overCompleted = false;
-
+  // int timeLineLength = 0;
+  // List<Ball> timeline = [];
+  // List<Over> history = [];
+  // bool overCompleted = false;
   void addScore(String val) {
-    if (overCompleted) return;
-
-    setState(() {
-      int run = int.parse(val);
-
-      score += run;
-
-      timeline.add(Ball(runs: run));
-      timeLineLength++;
-
-      if (timeLineLength == 6) {
-        overCompleted = true;
-      }
-    });
+    final track = context.read<Track>();
+    track.addScore(val);
   }
 
   void wicket() {
-    if (overCompleted) return;
-
-    setState(() {
-      wickets++;
-
-      timeline.add(Ball(wicket: true));
-      timeLineLength++;
-
-      if (timeLineLength == 6) {
-        overCompleted = true;
-      }
-    });
+    final track = context.read<Track>();
+    track.wicket();
   }
 
   void wide() {
-    setState(() {
-      score += 1;
-      timeline.add(Ball(extra: "WD"));
-    });
+    final track = context.read<Track>();
+    track.wide();
   }
 
   void twoG() {
-    if (overCompleted) return;
-    setState(() {
-      score += 2;
-      timeline.add(Ball(extra: "2G"));
-      timeLineLength += 1;
-      if (timeLineLength == 6) {
-        overCompleted = true;
-      }
-    });
+    final track = context.read<Track>();
+    track.twoG();
   }
 
   void noBall() {
-    setState(() {
-      score += 1;
-      timeline.add(Ball(extra: "NB"));
-    });
+    final track = context.read<Track>();
+    track.noBall();
   }
 
   void nextOver() {
-    setState(() {
-      history.add(Over()..balls = List.from(timeline));
-
-      timeline.clear();
-      timeLineLength = 0;
-
-      overCompleted = false;
-    });
+    final track = context.read<Track>();
+    track.nextOver();
   }
 
   double get getovers {
-    int completedOvers = history.length;
-    double currentOver = (timeLineLength * 0.1);
+    final track = context.read<Track>();
+    int completedOvers = track.history.length;
+    double currentOver = (track.timeLineLength * 0.1);
 
-    if (timeLineLength == 6) {
+    if (track.timeLineLength == 6) {
       return completedOvers + 1;
     }
     return completedOvers + currentOver;
@@ -128,11 +91,18 @@ class _ScoringScreenState extends State<ScoringScreen> {
             children: [
               matchBanner(bannerText: "Scoring Screen"),
 
-              scoreBoard(score: score, wickets: wickets, overs: getovers),
+              scoreBoard(
+                score: context.watch<Track>().score,
+                wickets: context.watch<Track>().wickets,
+                overs: getovers,
+              ),
 
               const SizedBox(height: 40),
-              displayTimeLine(vals: timeline, timeLineLength: timeLineLength),
-              if (overCompleted)
+              displayTimeLine(
+                vals: context.watch<Track>().timeline,
+                timeLineLength: context.watch<Track>().timeLineLength,
+              ),
+              if (context.watch<Track>().overCompleted)
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: SizedBox(
@@ -190,7 +160,9 @@ class _ScoringScreenState extends State<ScoringScreen> {
               sectionTitle("Over Values"),
               getValueWidget(
                 vals: overvals,
-                onPressed: overCompleted ? (_) {} : addScore,
+                onPressed: context.watch<Track>().overCompleted
+                    ? (_) {}
+                    : addScore,
                 selectedValue: null,
               ),
 

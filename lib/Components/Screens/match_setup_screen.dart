@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Data/teams.dart';
 import 'package:spartan_score/Components/Screens/navigation.dart';
 import 'package:spartan_score/Components/Screens/scoring_screen.dart';
+import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/get_value.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
@@ -50,37 +52,25 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
     availableTeams[8]: TeamCode.PBKS,
     availableTeams[9]: TeamCode.LSG,
   };
-  
+
   void setOvers(String value) {
-    setState(() {
-      overs = int.parse(value);
-    });
+    final track = context.read<Track>();
+    track.setOvers(value);
   }
 
   void setTeamSize(String value) {
-    setState(() {
-      teamSize = int.parse(value);
-    });
+    final track = context.read<Track>();
+    track.setTeamSize(value);
   }
 
   void setTeamA(String value) {
-    if (value == teamB) {
-      showError("Both teams cannot be the same");
-      return;
-    }
-    setState(() {
-      teamA = value;
-    });
+    final track = context.read<Track>();
+    track.setTeamA(value, context);
   }
 
   void setTeamB(String value) {
-    if (value == teamA) {
-      showError("Both teams cannot be the same");
-      return;
-    }
-    setState(() {
-      teamB = value;
-    });
+    final track = context.read<Track>();
+    track.setTeamB(value, context);
   }
 
   void showError(String text) {
@@ -112,7 +102,7 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
                 getValueWidget(
                   vals: availableOvers,
                   onPressed: setOvers,
-                  selectedValue: overs,
+                  selectedValue: context.watch<Track>().totalOvers,
                 ),
 
                 const SizedBox(height: 30),
@@ -121,14 +111,14 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
                 getValueWidget(
                   vals: availableTeamSize,
                   onPressed: setTeamSize,
-                  selectedValue: teamSize,
+                  selectedValue: context.watch<Track>().totalTeamSize,
                 ),
 
                 const SizedBox(height: 30),
 
                 sectionTitle("Team A"),
                 getTeamDropdown(
-                  value: teamA,
+                  value: context.watch<Track>().teamA,
                   teams: availableTeams,
                   onChanged: setTeamA,
                 ),
@@ -137,7 +127,7 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
 
                 sectionTitle("Team B"),
                 getTeamDropdown(
-                  value: teamB,
+                  value: context.watch<Track>().teamB,
                   teams: availableTeams,
                   onChanged: setTeamB,
                 ),
@@ -156,25 +146,21 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
                       ),
                     ),
                     onPressed: () {
-                      if (overs == null ||
-                          teamSize == null ||
-                          teamA == null ||
-                          teamB == null) {
+                      final track = context.read<Track>(); // ✅ read, not watch
+
+                      if (track.totalOvers == null ||
+                          track.totalTeamSize == null ||
+                          track.teamA == null ||
+                          track.teamB == null ||
+                          track.teamA!.isEmpty ||
+                          track.teamB!.isEmpty) {
                         showError("Complete all match settings");
                         return;
                       }
 
-                      print("Overs: $overs");
-                      print("Team Size: $teamSize");
-                      print("Team A: $teamA");
-                      print("Team B: $teamB");
-
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) =>
-                              const NavScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const NavScreen()),
                       );
                     },
                     child: const Text(
@@ -209,7 +195,7 @@ Widget getTeamDropdown({
       border: Border.all(color: AppColors.textPrimary.withOpacity(0.2)),
     ),
     child: DropdownButton<String>(
-      value: value,
+      value: value != null && teams.contains(value) ? value : null,
       dropdownColor: AppColors.run,
       hint: const Text(
         "Select Team",

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart' show WatchContext;
+import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
+import 'package:spartan_score/Components/widgets/score_card.dart';
+import 'package:spartan_score/Components/widgets/section_title.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
@@ -20,7 +24,22 @@ class _ResultScreenState extends State<ResultScreen> {
         decoration: const BoxDecoration(gradient: AppColors.gradientbackground),
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-          child: Column(children: [matchBanner(bannerText: "Result Screen")]),
+          child: Column(
+            children: [
+              matchBanner(bannerText: "Result Screen"),
+              sectionTitle(context.watch<Track>().teamA ?? "Team A"),
+              scoreBoard(
+                score: context.watch<Track>().score,
+                wickets: context.watch<Track>().wickets,
+              ),
+              SizedBox(height: 20.0),
+              sectionTitle(context.watch<Track>().teamB ?? "Team B"),
+              scoreBoard(
+                score: context.watch<Track>().score,
+                wickets: context.watch<Track>().wickets,
+              ),
+            ],
+          ),
         ),
       ),
     );
