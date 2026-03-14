@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:spartan_score/Components/Data/teams.dart';
+import 'package:spartan_score/Components/Screens/navigation.dart';
 import 'package:spartan_score/Components/Screens/scoring_screen.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/get_value.dart';
@@ -172,7 +173,7 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
                         context,
                         MaterialPageRoute<void>(
                           builder: (BuildContext context) =>
-                              const ScoringScreen(),
+                              const NavScreen(),
                         ),
                       );
                     },

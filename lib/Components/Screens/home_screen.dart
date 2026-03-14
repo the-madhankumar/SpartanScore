@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spartan_score/Components/Screens/match_setup_screen.dart';
+import 'package:spartan_score/Components/Screens/navigation.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -55,8 +56,7 @@ class HomeScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute<void>(
-                          builder: (BuildContext context) =>
-                              const MatchSetupScreen(),
+                          builder: (BuildContext context) => const MatchSetupScreen(),
                         ),
                       );
                     },
