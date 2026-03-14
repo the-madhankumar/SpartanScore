@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spartan_score/Components/Screens/match_setup_screen.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -50,7 +51,15 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const MatchSetupScreen(),
+                        ),
+                      );
+                    },
                     child: const Text(
                       "Start Match",
                       style: TextStyle(

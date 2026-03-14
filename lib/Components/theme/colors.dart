@@ -6,11 +6,12 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static const background = Color(0xFF121212);
   static const card = Color(0xFF1E1E1E);
 
   static const run = Color(0xFF1976D2);
+  static const selectedRun = Colors.teal;
   static const boundary = Color(0xFF42A5F5);
 
   static const extra = Color(0xFFFB8C00);
@@ -23,10 +24,10 @@ class AppColors {
 }
 
 class ButtonDesign {
-  static const height = 70;
+  static const height = 70.0;
   static const minimumwidth = 90;
-  static const borderradius = 12;
-  static const fontsize = 22;
+  static const borderradius = 12.0;
+  static const fontsize = 22.0;
   static const fontweight = FontWeight.bold;
   static const elevation = 2; // 2 - 4
 }
