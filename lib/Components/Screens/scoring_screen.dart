@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: deprecated_member_use, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +25,7 @@ class ScoringScreen extends StatefulWidget {
 
 class _ScoringScreenState extends State<ScoringScreen> {
   final List<String> overvals = ["1", "2", "3", "4", "6", "0"];
-  
+
   void addScore(String val) {
     final track = context.read<Track>();
     track.addScore(val);
@@ -75,6 +75,14 @@ class _ScoringScreenState extends State<ScoringScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final track = context.watch<Track>();
+
+    if (track.matchCompleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showMatchCompleted(context, track);
+      });
+    }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -239,5 +247,140 @@ Widget displayTimeLine({
 
       return timelineSingle(number: result.$1, backgroundColor: result.$2);
     }).toList(),
+  );
+}
+
+void showMatchCompleted(BuildContext context, Track track) {
+  String result = "";
+
+  if (track.teamAScore > track.teamBScore) {
+    result =
+        "${track.teamA} won by ${track.teamAScore - track.teamBScore} runs";
+  } else if (track.teamBScore > track.teamAScore) {
+    result =
+        "${track.teamB} won by ${track.totalTeamSize! - track.teamBWickets} wickets";
+  } else {
+    result = "Match Tied";
+  }
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 28),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: AppColors.undo.withOpacity(0.7),
+              width: 2,
+            ),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.emoji_events, color: Colors.amber, size: 46),
+              const SizedBox(height: 14),
+              const Text(
+                "MATCH RESULT",
+                style: TextStyle(
+                  fontSize: 13,
+                  letterSpacing: 3,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              Text(
+                track.teamA,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "${track.teamAScore}/${track.teamAWickets}",
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Text(
+                track.teamB,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "${track.teamBScore}/${track.teamBWickets}",
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Text(
+                result,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 26),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.undo,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  "CLOSE",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
 }

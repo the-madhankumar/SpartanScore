@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Service/track.dart';
+import 'package:spartan_score/Components/models/match.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
 import 'package:spartan_score/Components/widgets/section_title.dart';
@@ -43,6 +44,21 @@ class AnalyticsScreen extends StatelessWidget {
     double avgOver = overTotal.isEmpty
         ? 0
         : overTotal.reduce((a, b) => a + b) / overTotal.length;
+
+    List<Widget> xAxisLabels = [];
+
+    for (int i = 0; i < overTotal.length; i++) {
+      xAxisLabels.add(
+        Text(
+          "${i + 1}",
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -85,6 +101,13 @@ class AnalyticsScreen extends StatelessWidget {
                         size: 6,
                         color: Colors.amber,
                       ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: xAxisLabels,
                     ),
                   ],
                 ),
@@ -152,6 +175,14 @@ class AnalyticsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
+              sectionTitle("Score Card"),
+
+              Column(
+                children: <Widget>[
+                  ...displayScoreCard(context.watch<Track>().scorecard),
+                ],
+              ),
             ],
           ),
         ),
@@ -205,4 +236,68 @@ class AnalyticsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget displayCard({required Player child}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Text(
+              child.playerName.toString(),
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              child.runsScored.toString(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.greenAccent),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              child.ballsFaced.toString(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.green),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              ((child.runsScored / child.ballsFaced) * 100).toStringAsFixed(1),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.lightGreen),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+List displayScoreCard(List<Player> scores) {
+  List<Widget> cards = [];
+  for (var scored in scores) {
+    cards.add(displayCard(child: scored));
+  }
+  return cards;
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/models/ball.dart';
+import 'package:spartan_score/Components/models/match.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
 import 'package:spartan_score/Components/widgets/timeline_single.dart';
@@ -135,9 +136,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   return (currentStatus, background, runs);
 }
 
-int getTotal(List<Ball> vals){
+int getTotal(List<Ball> vals) {
   int resultTotal = 0;
-  for(var i in vals){
+  for (var i in vals) {
     resultTotal += i.runs;
   }
   return resultTotal;
