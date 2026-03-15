@@ -17,7 +17,7 @@ class Track extends ChangeNotifier {
   int teamBScore = 0;
   int teamBWickets = 0;
 
-  bool teamToggle = true; 
+  bool teamToggle = true;
 
   int score = 0;
   int wickets = 0;
@@ -77,7 +77,7 @@ class Track extends ChangeNotifier {
       return;
     }
     teamA = value;
-    _teamAPlayers = List.from(teamsMap[teamA]!.players); 
+    _teamAPlayers = List.from(teamsMap[teamA]!.players);
     strikerIndex = 0;
     nonStrikerIndex = 1;
     nextBatsmanIndex = 2;
@@ -90,7 +90,7 @@ class Track extends ChangeNotifier {
       return;
     }
     teamB = value;
-    _teamBPlayers = List.from(teamsMap[teamB]!.players); 
+    _teamBPlayers = List.from(teamsMap[teamB]!.players);
     notifyListeners();
   }
 
@@ -145,12 +145,14 @@ class Track extends ChangeNotifier {
     if (run % 2 == 1) swapPlayers();
 
     notifyListeners();
+
+    checkInningsEnd();
   }
 
   void wicket() {
     if (overCompleted) return;
     wickets++;
-    timeline.add(Ball(wicket: true));
+    timeline.add(Ball(wicket: true, runs: 0));
     timeLineLength++;
     if (timeLineLength >= 6) overCompleted = true;
 
@@ -167,22 +169,24 @@ class Track extends ChangeNotifier {
       strikerTimeline = 0;
       nextBatsmanIndex++;
     } else {
-      strikerIndex = -1; 
+      strikerIndex = -1;
     }
 
     notifyListeners();
+
+    checkInningsEnd();
   }
 
   void wide() {
     score += 1;
-    timeline.add(Ball(extra: "WD"));
+    timeline.add(Ball(extra: "WD", runs: 1));
     notifyListeners();
   }
 
   void twoG() {
     if (overCompleted) return;
     score += 2;
-    timeline.add(Ball(extra: "2G"));
+    timeline.add(Ball(extra: "2G", runs: 2));
     timeLineLength++;
     if (timeLineLength >= 6) overCompleted = true;
     notifyListeners();
@@ -190,7 +194,7 @@ class Track extends ChangeNotifier {
 
   void noBall() {
     score += 1;
-    timeline.add(Ball(extra: "NB"));
+    timeline.add(Ball(extra: "NB", runs: 1));
     notifyListeners();
   }
 
@@ -206,6 +210,41 @@ class Track extends ChangeNotifier {
   void swapPlayers() {
     togglePlayers = !togglePlayers;
     notifyListeners();
+  }
+
+  void checkInningsEnd() {
+    final maxOversReached =
+        totalOvers != null &&
+        (history.length + (timeLineLength / 6)) >= totalOvers!;
+    final allOut = totalTeamSize != null && wickets >= totalTeamSize! - 1;
+
+    if (maxOversReached || allOut) {
+      teamToggle = !teamToggle;
+
+      score = 0;
+      wickets = 0;
+      strikerScore = 0;
+      nonstrikerScore = 0;
+      strikerTimeline = 0;
+      nonStrikerTimeline = 0;
+      timeline.clear();
+      timeLineLength = 0;
+      overCompleted = false;
+
+      strikerIndex = 0;
+      nonStrikerIndex = 1;
+      nextBatsmanIndex = 2;
+
+      history.clear();
+
+      if (teamToggle) {
+        _teamAPlayers = List.from(teamsMap[teamA]!.players);
+      } else {
+        _teamBPlayers = List.from(teamsMap[teamB]!.players);
+      }
+
+      notifyListeners();
+    }
   }
 
   void resetMatch() {

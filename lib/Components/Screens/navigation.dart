@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spartan_score/Components/Screens/analytics_screen.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/Screens/scoring_screen.dart';
 import 'package:spartan_score/Components/Screens/over_summary_screen.dart';
@@ -14,7 +15,12 @@ class NavScreen extends StatefulWidget {
 class _NavScreenState extends State<NavScreen> {
   int index = 0;
 
-  final screens = [ScoringScreen(), HistoryScreen(), ResultScreen()];
+  final screens = [
+    ScoringScreen(),
+    AnalyticsScreen(),
+    HistoryScreen(),
+    ResultScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +92,17 @@ class _NavScreenState extends State<NavScreen> {
                       ),
                       NavigationDestination(
                         icon: Icon(
+                          Icons.analytics_outlined,
+                          color: Colors.white70,
+                        ),
+                        selectedIcon: Icon(
+                          Icons.analytics,
+                          color: Colors.white,
+                        ),
+                        label: "Analytics",
+                      ),
+                      NavigationDestination(
+                        icon: Icon(
                           Icons.history_outlined,
                           color: Colors.white70,
                         ),
@@ -94,11 +111,11 @@ class _NavScreenState extends State<NavScreen> {
                       ),
                       NavigationDestination(
                         icon: Icon(
-                          Icons.analytics_outlined,
+                          Icons.emoji_events_outlined,
                           color: Colors.white70,
                         ),
                         selectedIcon: Icon(
-                          Icons.analytics_rounded,
+                          Icons.emoji_events,
                           color: Colors.white,
                         ),
                         label: "Result",

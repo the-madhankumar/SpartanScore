@@ -19,12 +19,13 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Image.asset('assets/Images/logo.png', height: 240),
 
-                const Text(
+                const SizedBox(height: 10),
+
+                Text(
                   "SPARTAN SCORE",
                   style: TextStyle(
                     fontSize: 42,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 3,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -56,7 +57,8 @@ class HomeScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute<void>(
-                          builder: (BuildContext context) => const MatchSetupScreen(),
+                          builder: (BuildContext context) =>
+                              const MatchSetupScreen(),
                         ),
                       );
                     },

@@ -25,13 +25,7 @@ class ScoringScreen extends StatefulWidget {
 
 class _ScoringScreenState extends State<ScoringScreen> {
   final List<String> overvals = ["1", "2", "3", "4", "6", "0"];
-  // int score = 0;
-  // int wickets = 0;
-
-  // int timeLineLength = 0;
-  // List<Ball> timeline = [];
-  // List<Over> history = [];
-  // bool overCompleted = false;
+  
   void addScore(String val) {
     final track = context.read<Track>();
     track.addScore(val);

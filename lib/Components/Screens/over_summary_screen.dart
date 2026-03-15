@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Service/track.dart';
@@ -60,9 +62,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             height: 60,
                             decoration: BoxDecoration(
-                              color: Colors
-                                  .amber
-                                  .shade300, // lighter amber for modern look
+                              color: Colors.amber.shade300,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
@@ -77,6 +77,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               children: [
                                 Text(
                                   "Over ${index + 1}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Text(
+                                  "Total ${getTotal(context.watch<Track>().history[index].balls)}",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
@@ -104,9 +112,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 }
 
-(String, Color) getBallValue(Ball given) {
+(String, Color, int) getBallValue(Ball given) {
   String currentStatus = "";
   Color background;
+  int runs = 0;
 
   if (given.wicket == true) {
     currentStatus = "W";
@@ -114,26 +123,54 @@ class _HistoryScreenState extends State<HistoryScreen> {
   } else if (given.extra.isNotEmpty) {
     currentStatus = given.extra;
     background = AppColors.extra;
+    runs = given.runs;
   } else if (given.runs != -1) {
     currentStatus = given.runs.toString();
     background = AppColors.run;
+    runs = given.runs;
   } else {
     currentStatus = "";
     background = AppColors.textPrimary;
   }
-  return (currentStatus, background);
+  return (currentStatus, background, runs);
+}
+
+int getTotal(List<Ball> vals){
+  int resultTotal = 0;
+  for(var i in vals){
+    resultTotal += i.runs;
+  }
+  return resultTotal;
 }
 
 Widget displayTimeLine({required List<Ball> vals}) {
-  return Wrap(
-    spacing: 18,
-    runSpacing: 18,
-    alignment: WrapAlignment.center,
-    children: vals.map((ball) {
-      final result = getBallValue(ball);
+  int currentOverTotal = 0;
 
-      return timelineSingle(number: result.$1, backgroundColor: result.$2);
-    }).toList(),
+  final ballWidgets = vals.map((ball) {
+    final result = getBallValue(ball);
+    currentOverTotal += result.$3;
+    return timelineSingle(number: result.$1, backgroundColor: result.$2);
+  }).toList();
+
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Wrap(
+        spacing: 18,
+        runSpacing: 18,
+        alignment: WrapAlignment.center,
+        children: ballWidgets,
+      ),
+      const SizedBox(height: 12),
+      Text(
+        "Total: $currentOverTotal",
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    ],
   );
 }
 
