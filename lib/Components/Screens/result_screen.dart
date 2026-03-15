@@ -27,16 +27,16 @@ class _ResultScreenState extends State<ResultScreen> {
           child: Column(
             children: [
               matchBanner(bannerText: "Result Screen"),
-              sectionTitle(context.watch<Track>().teamA ?? "Team A"),
+              sectionTitle(context.watch<Track>().teamA),
               scoreBoard(
-                score: context.watch<Track>().score,
-                wickets: context.watch<Track>().wickets,
+                score: context.watch<Track>().teamAScore,
+                wickets: context.watch<Track>().teamAWickets,
               ),
               SizedBox(height: 20.0),
-              sectionTitle(context.watch<Track>().teamB ?? "Team B"),
+              sectionTitle(context.watch<Track>().teamB),
               scoreBoard(
-                score: context.watch<Track>().score,
-                wickets: context.watch<Track>().wickets,
+                score: context.watch<Track>().teamBScore,
+                wickets: context.watch<Track>().teamBWickets,
               ),
             ],
           ),

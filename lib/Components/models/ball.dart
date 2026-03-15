@@ -13,4 +13,5 @@ class Ball {
 class Over {
   List<Ball> balls = [];
   bool locked = false;
+  int currentOverTotal = 0;
 }

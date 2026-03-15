@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Data/teams.dart';
 import 'package:spartan_score/Components/Screens/navigation.dart';
-import 'package:spartan_score/Components/Screens/scoring_screen.dart';
 import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/get_value.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
-import 'package:spartan_score/Components/widgets/run_buttons.dart';
 import 'package:spartan_score/Components/widgets/section_title.dart';
 
 class MatchSetupScreen extends StatefulWidget {
@@ -150,10 +148,8 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
 
                       if (track.totalOvers == null ||
                           track.totalTeamSize == null ||
-                          track.teamA == null ||
-                          track.teamB == null ||
-                          track.teamA!.isEmpty ||
-                          track.teamB!.isEmpty) {
+                          track.teamA.isEmpty ||
+                          track.teamB.isEmpty) {
                         showError("Complete all match settings");
                         return;
                       }

@@ -8,13 +8,31 @@ class Over {
 }
 
 class Track extends ChangeNotifier {
+  // common
   int? totalOvers;
   int? totalTeamSize;
-  String teamA = "";
-  String teamB = "";
 
+  String teamA = "";
+  int teamAScore = 0;
+  int teamAWickets = 0;
+
+  String teamB = "";
+  int teamBScore = 0;
+  int teamBWickets = 0;
+
+  bool teamToggle = true;
+
+  // per innings
   int score = 0;
   int wickets = 0;
+
+  int strikerScore = 0;
+  int strikerTimeline = 0;
+
+  int nonstrikerScore = 0;
+  int nonStrikerTimeline = 0;
+
+  bool togglePlayers = true;
 
   int timeLineLength = 0;
   List<Ball> timeline = [];
@@ -67,6 +85,24 @@ class Track extends ChangeNotifier {
     timeline.add(Ball(runs: run));
     timeLineLength++;
     if (timeLineLength >= 6) overCompleted = true;
+
+    if(teamToggle){
+      teamAScore = score;
+    } else {
+      teamBScore = score;
+    }
+
+    if (togglePlayers) {
+      strikerScore += run;
+      strikerTimeline += 1;
+    } else {
+      nonstrikerScore += run;
+      nonStrikerTimeline += 1;
+    }
+
+    if (run % 2 == 1) {
+      togglePlayers = !togglePlayers;
+    }
     notifyListeners();
   }
 
@@ -76,6 +112,12 @@ class Track extends ChangeNotifier {
     timeline.add(Ball(wicket: true));
     timeLineLength++;
     if (timeLineLength >= 6) overCompleted = true;
+
+    if(teamToggle){
+      teamAWickets = wickets;
+    } else {
+      teamBWickets = wickets;
+    }
     notifyListeners();
   }
 
@@ -105,6 +147,7 @@ class Track extends ChangeNotifier {
     timeline.clear();
     timeLineLength = 0;
     overCompleted = false;
+    togglePlayers = !togglePlayers;
     notifyListeners();
   }
 

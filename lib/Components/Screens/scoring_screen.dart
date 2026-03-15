@@ -9,6 +9,7 @@ import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/extras_buttons.dart';
 import 'package:spartan_score/Components/widgets/get_value.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
+import 'package:spartan_score/Components/widgets/players.dart';
 import 'package:spartan_score/Components/widgets/score_card.dart';
 import 'package:spartan_score/Components/widgets/section_title.dart';
 import 'package:spartan_score/Components/widgets/timeline_single.dart';
@@ -96,6 +97,9 @@ class _ScoringScreenState extends State<ScoringScreen> {
                 wickets: context.watch<Track>().wickets,
                 overs: getovers,
               ),
+
+              SizedBox(height: 40),
+              scorePlayers(),
 
               const SizedBox(height: 40),
               displayTimeLine(
