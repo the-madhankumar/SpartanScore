@@ -1,14 +1,11 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:spartan_score/Components/theme/colors.dart';
-import 'package:spartan_score/Components/models/ball.dart';
+// ignore_for_file: avoid_print
 
-class Over {
-  List<Ball> balls = [];
-}
+import 'package:flutter/material.dart';
+import 'package:spartan_score/Components/Data/teams.dart';
+import 'package:spartan_score/Components/models/ball.dart';
+import 'package:spartan_score/Components/theme/colors.dart';
 
 class Track extends ChangeNotifier {
-  // common
   int? totalOvers;
   int? totalTeamSize;
 
@@ -20,9 +17,8 @@ class Track extends ChangeNotifier {
   int teamBScore = 0;
   int teamBWickets = 0;
 
-  bool teamToggle = true;
+  bool teamToggle = true; 
 
-  // per innings
   int score = 0;
   int wickets = 0;
 
@@ -34,12 +30,37 @@ class Track extends ChangeNotifier {
 
   bool togglePlayers = true;
 
+  Map<String, Team> get teamsMap => {
+    "Chennai Super Kings": TeamCode.CSK,
+    "Mumbai Indians": TeamCode.MI,
+    "Gujarat Titans": TeamCode.GT,
+    "Royal Challengers Bengaluru": TeamCode.RCB,
+    "Kolkata Knight Riders": TeamCode.KKR,
+    "Delhi Capitals": TeamCode.DC,
+    "Rajasthan Royals": TeamCode.RR,
+    "Sunrisers Hyderabad": TeamCode.SRH,
+    "Punjab Kings": TeamCode.PBKS,
+    "Lucknow Super Giants": TeamCode.LSG,
+  };
+
+  Team get teamAInfo => teamsMap[teamA] ?? TeamCode.CSK;
+  Team get teamBInfo => teamsMap[teamB] ?? TeamCode.MI;
+
+  List<String> _teamAPlayers = [];
+  List<String> _teamBPlayers = [];
+
+  List<String> get teamAPlayers => _teamAPlayers;
+  List<String> get teamBPlayers => _teamBPlayers;
+
+  int strikerIndex = 0;
+  int nonStrikerIndex = 1;
+  int nextBatsmanIndex = 2;
+
   int timeLineLength = 0;
   List<Ball> timeline = [];
   List<Over> history = [];
   bool overCompleted = false;
 
-  // ---------------- Team & Match Setup ----------------
   void setOvers(String value) {
     totalOvers = int.tryParse(value);
     notifyListeners();
@@ -56,6 +77,10 @@ class Track extends ChangeNotifier {
       return;
     }
     teamA = value;
+    _teamAPlayers = List.from(teamsMap[teamA]!.players); 
+    strikerIndex = 0;
+    nonStrikerIndex = 1;
+    nextBatsmanIndex = 2;
     notifyListeners();
   }
 
@@ -65,6 +90,7 @@ class Track extends ChangeNotifier {
       return;
     }
     teamB = value;
+    _teamBPlayers = List.from(teamsMap[teamB]!.players); 
     notifyListeners();
   }
 
@@ -77,7 +103,23 @@ class Track extends ChangeNotifier {
     );
   }
 
-  // ---------------- Score Tracking ----------------
+  void setOpeningPlayers({required List<String> players}) {
+    if (teamToggle) {
+      _teamAPlayers = List.from(players);
+    } else {
+      _teamBPlayers = List.from(players);
+    }
+    strikerIndex = 0;
+    nonStrikerIndex = 1;
+    nextBatsmanIndex = 2;
+    strikerScore = 0;
+    nonstrikerScore = 0;
+    strikerTimeline = 0;
+    nonStrikerTimeline = 0;
+    togglePlayers = true;
+    notifyListeners();
+  }
+
   void addScore(String val) {
     if (overCompleted) return;
     int run = int.tryParse(val) ?? 0;
@@ -86,7 +128,7 @@ class Track extends ChangeNotifier {
     timeLineLength++;
     if (timeLineLength >= 6) overCompleted = true;
 
-    if(teamToggle){
+    if (teamToggle) {
       teamAScore = score;
     } else {
       teamBScore = score;
@@ -94,15 +136,14 @@ class Track extends ChangeNotifier {
 
     if (togglePlayers) {
       strikerScore += run;
-      strikerTimeline += 1;
+      strikerTimeline++;
     } else {
       nonstrikerScore += run;
-      nonStrikerTimeline += 1;
+      nonStrikerTimeline++;
     }
 
-    if (run % 2 == 1) {
-      togglePlayers = !togglePlayers;
-    }
+    if (run % 2 == 1) swapPlayers();
+
     notifyListeners();
   }
 
@@ -113,11 +154,22 @@ class Track extends ChangeNotifier {
     timeLineLength++;
     if (timeLineLength >= 6) overCompleted = true;
 
-    if(teamToggle){
+    if (teamToggle) {
       teamAWickets = wickets;
     } else {
       teamBWickets = wickets;
     }
+
+    final players = teamToggle ? _teamAPlayers : _teamBPlayers;
+    if (nextBatsmanIndex < players.length) {
+      strikerIndex = nextBatsmanIndex;
+      strikerScore = 0;
+      strikerTimeline = 0;
+      nextBatsmanIndex++;
+    } else {
+      strikerIndex = -1; 
+    }
+
     notifyListeners();
   }
 
@@ -147,6 +199,11 @@ class Track extends ChangeNotifier {
     timeline.clear();
     timeLineLength = 0;
     overCompleted = false;
+    swapPlayers();
+    notifyListeners();
+  }
+
+  void swapPlayers() {
     togglePlayers = !togglePlayers;
     notifyListeners();
   }
@@ -162,6 +219,23 @@ class Track extends ChangeNotifier {
     totalTeamSize = null;
     teamA = "";
     teamB = "";
+    _teamAPlayers.clear();
+    _teamBPlayers.clear();
+    strikerIndex = 0;
+    nonStrikerIndex = 1;
+    nextBatsmanIndex = 2;
     notifyListeners();
+  }
+
+  String get currentStriker {
+    final players = teamToggle ? _teamAPlayers : _teamBPlayers;
+    if (strikerIndex < 0 || strikerIndex >= players.length) return "";
+    return players[strikerIndex];
+  }
+
+  String get currentNonStriker {
+    final players = teamToggle ? _teamAPlayers : _teamBPlayers;
+    if (nonStrikerIndex < 0 || nonStrikerIndex >= players.length) return "";
+    return players[nonStrikerIndex];
   }
 }

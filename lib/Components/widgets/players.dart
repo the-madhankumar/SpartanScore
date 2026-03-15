@@ -112,7 +112,7 @@ Widget scorePlayers() {
               children: [
                 // Striker
                 PlayerScoreCard(
-                  name: "Striker",
+                  name: track.currentStriker,
                   score: track.strikerScore,
                   timeline: track.strikerTimeline,
                   isActive: track.togglePlayers,
@@ -120,7 +120,7 @@ Widget scorePlayers() {
 
                 // Non-Striker
                 PlayerScoreCard(
-                  name: "Non-Striker",
+                  name: track.currentNonStriker,
                   score: track.nonstrikerScore,
                   timeline: track.nonStrikerTimeline,
                   isActive: !track.togglePlayers,
