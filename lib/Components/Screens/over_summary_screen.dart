@@ -1,10 +1,9 @@
-import 'dart:ffi';
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/models/ball.dart';
-import 'package:spartan_score/Components/models/match.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
 import 'package:spartan_score/Components/widgets/timeline_single.dart';

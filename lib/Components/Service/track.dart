@@ -63,8 +63,10 @@ class Track extends ChangeNotifier {
   List<Player> scorecard = [];
 
   bool overCompleted = false;
-
   bool matchCompleted = false;
+  bool inningsCompleted = false;
+
+  int target = 0;
 
   void setOvers(String value) {
     totalOvers = int.tryParse(value);
@@ -131,19 +133,17 @@ class Track extends ChangeNotifier {
     int run = int.tryParse(val) ?? 0;
     score += run;
     timeline.add(Ball(runs: run));
-    timeLineLength++;
-    if (timeLineLength >= 6) overCompleted = true;
+
+    if (timeLineLength == 5) {
+      overCompleted = true;
+    } else {
+      timeLineLength++;
+    }
 
     if (teamToggle) {
       teamAScore = score;
     } else {
       teamBScore = score;
-
-      if (teamBScore > teamAScore) {
-        matchCompleted = true;
-        notifyListeners();
-        return;
-      }
     }
 
     if (togglePlayers) {
@@ -156,8 +156,15 @@ class Track extends ChangeNotifier {
 
     if (run % 2 == 1) swapPlayers();
 
-    notifyListeners();
+    if (!teamToggle) {
+      if (teamBScore > teamAScore) {
+        matchCompleted = true;
+        notifyListeners();
+        return;
+      }
+    }
 
+    notifyListeners();
     checkInningsEnd();
   }
 
@@ -166,9 +173,12 @@ class Track extends ChangeNotifier {
 
     wickets++;
     timeline.add(Ball(wicket: true, runs: 0));
-    timeLineLength++;
 
-    if (timeLineLength >= 6) overCompleted = true;
+    if (timeLineLength == 5) {
+      overCompleted = true;
+    } else {
+      timeLineLength++;
+    }
 
     if (teamToggle) {
       teamAWickets = wickets;
@@ -216,6 +226,20 @@ class Track extends ChangeNotifier {
     if (matchCompleted) return;
     score += 1;
     timeline.add(Ball(extra: "WD", runs: 1));
+
+    if (teamToggle) {
+      teamAScore = score;
+    } else {
+      teamBScore = score;
+    }
+
+    if (!teamToggle) {
+      if (teamBScore > teamAScore) {
+        matchCompleted = true;
+        notifyListeners();
+        return;
+      }
+    }
     notifyListeners();
   }
 
@@ -223,15 +247,63 @@ class Track extends ChangeNotifier {
     if (overCompleted || matchCompleted) return;
     score += 2;
     timeline.add(Ball(extra: "2G", runs: 2));
-    timeLineLength++;
-    if (timeLineLength >= 6) overCompleted = true;
+
+    if (timeLineLength == 5) {
+      overCompleted = true;
+    } else {
+      timeLineLength++;
+    }
+
+    if (teamToggle) {
+      teamAScore = score;
+    } else {
+      teamBScore = score;
+    }
+
+    if (togglePlayers) {
+      strikerScore += 2;
+      strikerTimeline++;
+    } else {
+      nonstrikerScore += 2;
+      nonStrikerTimeline++;
+    }
+
+    if (!teamToggle) {
+      if (teamBScore > teamAScore) {
+        matchCompleted = true;
+        notifyListeners();
+        return;
+      }
+    }
     notifyListeners();
   }
 
-  void noBall() {
+  void noBall(int val) {
     if (matchCompleted) return;
-    score += 1;
-    timeline.add(Ball(extra: "NB", runs: 1));
+    score += (val + 1);
+    timeline.add(Ball(extra: "NB$val", runs: val + 1));
+
+    if (val % 2 == 1) swapPlayers();
+
+    if (teamToggle) {
+      teamAScore = score;
+    } else {
+      teamBScore = score;
+    }
+
+    if (togglePlayers) {
+      strikerScore += val;
+    } else {
+      nonstrikerScore += val;
+    }
+
+    if (!teamToggle) {
+      if (teamBScore > teamAScore) {
+        matchCompleted = true;
+        notifyListeners();
+        return;
+      }
+    }
     notifyListeners();
   }
 
@@ -248,41 +320,74 @@ class Track extends ChangeNotifier {
   void swapPlayers() {
     if (matchCompleted) return;
     togglePlayers = !togglePlayers;
+  }
+
+  void moveNextInnings() {
+    target += (teamAScore + 1);
+
+    teamToggle = false;
+    inningsCompleted = false;
+
+    score = 0;
+    wickets = 0;
+
+    strikerScore = 0;
+    nonstrikerScore = 0;
+    strikerTimeline = 0;
+    nonStrikerTimeline = 0;
+
+    timeline.clear();
+    history.clear();
+    scorecard.clear();
+
+    timeLineLength = 0;
+    overCompleted = false;
+
+    strikerIndex = 0;
+    nonStrikerIndex = 1;
+    nextBatsmanIndex = 2;
+
     notifyListeners();
   }
 
   void checkInningsEnd() {
-    if (matchCompleted) return;
+    if (matchCompleted || inningsCompleted) return;
 
     final maxOversReached =
         totalOvers != null &&
-        (history.length + (timeLineLength / 6)) >= totalOvers!;
+        (history.length + (overCompleted ? 1 : 0)) == totalOvers;
 
     final allOut = totalTeamSize != null && wickets >= totalTeamSize! - 1;
 
     if (maxOversReached || allOut) {
-      if (teamToggle) {
-        teamToggle = false;
-        scorecard.clear();
+      checkMatchWin();
 
-        score = 0;
-        wickets = 0;
-        strikerScore = 0;
-        nonstrikerScore = 0;
-        strikerTimeline = 0;
-        nonStrikerTimeline = 0;
+      inningsCompleted = true;
 
+      if (timeline.isNotEmpty && timeLineLength > 0) {
+        history.add(Over()..balls = List.from(timeline));
         timeline.clear();
         timeLineLength = 0;
-        overCompleted = false;
+      }
 
-        strikerIndex = 0;
-        nonStrikerIndex = 1;
-        nextBatsmanIndex = 2;
+      if (strikerTimeline > 0) {
+        scorecard.add(
+          Player(
+            playerName: currentStriker,
+            runsScored: strikerScore,
+            ballsFaced: strikerTimeline,
+          ),
+        );
+      }
 
-        _teamBPlayers = List.from(teamsMap[teamB]!.players);
-      } else {
-        matchCompleted = true;
+      if (nonStrikerTimeline > 0) {
+        scorecard.add(
+          Player(
+            playerName: currentNonStriker,
+            runsScored: nonstrikerScore,
+            ballsFaced: nonStrikerTimeline,
+          ),
+        );
       }
 
       notifyListeners();
@@ -324,5 +429,41 @@ class Track extends ChangeNotifier {
     final players = teamToggle ? _teamAPlayers : _teamBPlayers;
     if (nonStrikerIndex < 0 || nonStrikerIndex >= players.length) return "";
     return players[nonStrikerIndex];
+  }
+
+  void checkMatchWin() {
+    if (matchCompleted) return;
+
+    if (!teamToggle && teamBScore > teamAScore) {
+      if (togglePlayers) {
+        scorecard.add(
+          Player(
+            playerName: currentStriker,
+            runsScored: strikerScore,
+            ballsFaced: strikerTimeline,
+          ),
+        );
+
+        strikerIndex = nextBatsmanIndex;
+        strikerScore = 0;
+        strikerTimeline = 0;
+      } else {
+        scorecard.add(
+          Player(
+            playerName: currentNonStriker,
+            runsScored: nonstrikerScore,
+            ballsFaced: nonStrikerTimeline,
+          ),
+        );
+
+        nonStrikerIndex = nextBatsmanIndex;
+        nonstrikerScore = 0;
+        nonStrikerTimeline = 0;
+      }
+
+      history.add(Over()..balls = List.from(timeline));
+
+      matchCompleted = true;
+    }
   }
 }

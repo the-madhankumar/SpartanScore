@@ -8,21 +8,25 @@ Widget timelineSingle({
   return SizedBox(
     height: 50,
     width: 50,
-    child: Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(50),
-      elevation: 3,
-      child: InkWell(
+    child: Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(50),
-        onTap: () {},
-        child: Center(
-          child: Text(
-            number,
-            style: const TextStyle(
-              fontSize: ButtonDesign.fontsize,
-              fontWeight: ButtonDesign.fontweight,
-              color: AppColors.textPrimary,
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          number,
+          style: const TextStyle(
+            fontSize: ButtonDesign.fontsize,
+            fontWeight: ButtonDesign.fontweight,
+            color: AppColors.textPrimary,
           ),
         ),
       ),

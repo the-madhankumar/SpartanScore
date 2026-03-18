@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 
-Widget scoreBoard({required int score, required int wickets, double? overs}) {
+Widget scoreBoard({required int score, required int wickets, String? overs}) {
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 26),
@@ -83,7 +83,7 @@ Widget scoreBoard({required int score, required int wickets, double? overs}) {
               color: Colors.white.withOpacity(0.08),
             ),
             child: Text(
-              "Overs: ${overs.toStringAsFixed(1)}",
+              overs,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,

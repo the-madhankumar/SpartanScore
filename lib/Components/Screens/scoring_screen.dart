@@ -9,6 +9,7 @@ import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/extras_buttons.dart';
 import 'package:spartan_score/Components/widgets/get_value.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
+import 'package:spartan_score/Components/widgets/next_widget.dart';
 import 'package:spartan_score/Components/widgets/players.dart';
 import 'package:spartan_score/Components/widgets/score_card.dart';
 import 'package:spartan_score/Components/widgets/section_title.dart';
@@ -46,9 +47,9 @@ class _ScoringScreenState extends State<ScoringScreen> {
     track.twoG();
   }
 
-  void noBall() {
+  void noBall(int val) {
     final track = context.read<Track>();
-    track.noBall();
+    track.noBall(val);
   }
 
   void nextOver() {
@@ -56,19 +57,32 @@ class _ScoringScreenState extends State<ScoringScreen> {
     track.nextOver();
   }
 
-  double get getovers {
+  void moveNextInnings() {
     final track = context.read<Track>();
-    int completedOvers = track.history.length;
-    double currentOver = (track.timeLineLength * 0.1);
+    track.moveNextInnings();
+  }
 
-    if (track.timeLineLength == 6) {
-      return completedOvers + 1;
+  String get getovers {
+    final track = context.watch<Track>();
+
+    int completedOvers = track.history.length;
+    int balls = track.timeLineLength;
+
+    if (track.overCompleted) {
+      balls = 0; 
     }
-    return completedOvers + currentOver;
+
+    return "$completedOvers.$balls";
   }
 
   List<Extras> get availableExtra => [
-    Extras("NB", noBall),
+    Extras(
+      "NB",
+      () => showNoBallScore(context, (run) {
+        print("Selected run: $run");
+        noBall(int.parse(run));
+      }),
+    ),
     Extras("2G", twoG),
     Extras("WD", wide),
   ];
@@ -97,7 +111,7 @@ class _ScoringScreenState extends State<ScoringScreen> {
               scoreBoard(
                 score: context.watch<Track>().score,
                 wickets: context.watch<Track>().wickets,
-                overs: getovers,
+                overs: "Overs: $getovers",
               ),
 
               SizedBox(height: 40),
@@ -108,59 +122,11 @@ class _ScoringScreenState extends State<ScoringScreen> {
                 vals: context.watch<Track>().timeline,
                 timeLineLength: context.watch<Track>().timeLineLength,
               ),
-              if (context.watch<Track>().overCompleted)
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: SizedBox(
-                    height: ButtonDesign.height,
-                    width: 110,
-                    child: Material(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(30),
-                      elevation: 2,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(30),
-                        onTap: nextOver,
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: AppColors.undo, width: 2),
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.undo.withOpacity(0.9),
-                                AppColors.undo.withOpacity(0.6),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: const Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.next_plan,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                                SizedBox(width: 6),
-                                Text(
-                                  "NEXT OVER",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+
+              if (context.watch<Track>().inningsCompleted)
+                nextWidget("Innings Completed", onPressed: moveNextInnings)
+              else if (context.watch<Track>().overCompleted)
+                nextWidget("Next Over", onPressed: nextOver),
 
               const SizedBox(height: 40),
               sectionTitle("Over Values"),
@@ -196,8 +162,8 @@ class _ScoringScreenState extends State<ScoringScreen> {
 }
 
 class Extras {
-  late String label;
-  late void Function() onPressed;
+  final String label;
+  final void Function() onPressed;
 
   Extras(this.label, this.onPressed);
 }
@@ -250,6 +216,64 @@ Widget displayTimeLine({
   );
 }
 
+void showNoBallScore(BuildContext context, void Function(String) onPressed) {
+  final List<String> availableRuns = ["1", "2", "3", "4", "6", "0"];
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: AppColors.gradientbackground,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: AppColors.undo.withOpacity(0.7),
+              width: 2,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Select Run for No-Ball",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (var i in availableRuns)
+                    InkWell(
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () {
+                        onPressed(i);
+                        Navigator.pop(context);
+                      },
+                      child: timelineSingle(
+                        number: i,
+                        backgroundColor: AppColors.boundary,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 void showMatchCompleted(BuildContext context, Track track) {
   String result = "";
 
@@ -278,11 +302,7 @@ void showMatchCompleted(BuildContext context, Track track) {
               color: AppColors.undo.withOpacity(0.7),
               width: 2,
             ),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: AppColors.gradientbackground,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.4),

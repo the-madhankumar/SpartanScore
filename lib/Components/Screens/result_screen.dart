@@ -1,6 +1,7 @@
+import 'package:provider/provider.dart';
+import 'package:spartan_score/Components/Service/track.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart' show WatchContext;
-import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
 import 'package:spartan_score/Components/widgets/score_card.dart';
@@ -16,6 +17,8 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
+    final track = context.watch<Track>();
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -27,17 +30,14 @@ class _ResultScreenState extends State<ResultScreen> {
           child: Column(
             children: [
               matchBanner(bannerText: "Result Screen"),
-              sectionTitle(context.watch<Track>().teamA),
-              scoreBoard(
-                score: context.watch<Track>().teamAScore,
-                wickets: context.watch<Track>().teamAWickets,
-              ),
-              SizedBox(height: 20.0),
-              sectionTitle(context.watch<Track>().teamB),
-              scoreBoard(
-                score: context.watch<Track>().teamBScore,
-                wickets: context.watch<Track>().teamBWickets,
-              ),
+
+              sectionTitle(track.teamA),
+              scoreBoard(score: track.teamAScore, wickets: track.teamAWickets),
+
+              const SizedBox(height: 20.0),
+
+              sectionTitle(track.teamB),
+              scoreBoard(score: track.teamBScore, wickets: track.teamBWickets, overs: "Remaining: ${(track.target < track.teamBScore) ? 0 : track.target - track.teamBScore}"),
             ],
           ),
         ),
