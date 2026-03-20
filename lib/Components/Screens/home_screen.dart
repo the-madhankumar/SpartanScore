@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   "SPARTAN SCORE",
                   style: TextStyle(
-                    fontSize: 42,
+                    fontSize: 28,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
                   ),

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:spartan_score/Components/Service/track.dart';
 import 'package:spartan_score/Components/models/ball.dart';
 import 'package:spartan_score/Components/theme/colors.dart';
+import 'package:spartan_score/Components/widgets/comming_soon.dart';
 import 'package:spartan_score/Components/widgets/extras_buttons.dart';
 import 'package:spartan_score/Components/widgets/get_value.dart';
 import 'package:spartan_score/Components/widgets/match_banner.dart';
@@ -60,6 +61,11 @@ class _ScoringScreenState extends State<ScoringScreen> {
   void moveNextInnings() {
     final track = context.read<Track>();
     track.moveNextInnings();
+  }
+
+  void undo() {
+    final track = context.read<Track>();
+    track.undo();
   }
 
   String get getovers {
@@ -150,7 +156,7 @@ class _ScoringScreenState extends State<ScoringScreen> {
                 children: [
                   wicketButton(onPressed: wicket),
                   SizedBox(width: 40),
-                  undoButton(onPressed: wicket),
+                  undoButton(onPressed: () => showComingSoon(context)),
                 ],
               ),
             ],

@@ -22,6 +22,7 @@ flutter:
 
   assets:
     - assets/Images/logo.png
+    - assets/Images/sslogo.png
 
 flutter_launcher_icons:
   android: true

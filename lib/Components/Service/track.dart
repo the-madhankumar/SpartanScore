@@ -394,6 +394,38 @@ class Track extends ChangeNotifier {
     }
   }
 
+  void undo() {
+    if (timeline.isEmpty) return;
+
+    Ball lastVal = timeline.removeLast();
+
+    timeLineLength--;
+
+    int run = lastVal.runs;
+
+    if (teamToggle) {
+      teamAScore -= run;
+    } else {
+      teamBScore -= run;
+    }
+
+    score -= run;
+
+    if (lastVal.wicket) {
+      wickets--;
+    }
+
+    if (togglePlayers && (run%2 ==0)) {
+      strikerScore -= run;
+      strikerTimeline--;
+    } else {
+      nonstrikerScore -= run;
+      nonStrikerTimeline--;
+    }
+
+    notifyListeners();
+  }
+
   void resetMatch() {
     score = 0;
     wickets = 0;
