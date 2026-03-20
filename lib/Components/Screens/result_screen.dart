@@ -29,7 +29,7 @@ class _ResultScreenState extends State<ResultScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
           child: Column(
             children: [
-              matchBanner(bannerText: "Result Screen"),
+              matchBanner(bannerText: "Result Screen", context: context),
 
               sectionTitle(track.teamA),
               scoreBoard(score: track.teamAScore, wickets: track.teamAWickets),

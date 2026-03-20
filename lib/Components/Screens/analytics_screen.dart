@@ -71,7 +71,7 @@ class AnalyticsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              matchBanner(bannerText: "Analytics Screen"),
+              matchBanner(bannerText: "Analytics Screen", context: context),
 
               // Worm Graph
               sectionTitle("Worm Graph"),

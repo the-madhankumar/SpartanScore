@@ -28,7 +28,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
           child: Column(
             children: [
-              matchBanner(bannerText: "Summary Screen"),
+              matchBanner(bannerText: "Summary Screen", context: context),
 
               Column(
                 children: [

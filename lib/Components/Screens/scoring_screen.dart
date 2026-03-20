@@ -112,7 +112,7 @@ class _ScoringScreenState extends State<ScoringScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
           child: Column(
             children: [
-              matchBanner(bannerText: "Scoring Screen"),
+              matchBanner(bannerText: "Scoring Screen", context: context),
 
               scoreBoard(
                 score: context.watch<Track>().score,

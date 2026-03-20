@@ -92,7 +92,7 @@ class _MatchSetupScreenState extends State<MatchSetupScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
             child: Column(
               children: [
-                matchBanner(bannerText: "Match Setup"),
+                matchBanner(bannerText: "Match Setup", context: context),
 
                 const SizedBox(height: 40),
 
